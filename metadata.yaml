@@ -1,0 +1,13 @@
+# Copyright 2023 Claudiu Belu
+# See LICENSE file for licensing details.
+#
+name: reverse-proxy-k8s
+
+# The following metadata are human-readable and will be published prominently on Charmhub.
+
+display-name: Reverse Proxy Kubernetes Service Charm
+
+summary: Utility charm for creating a Reverse Proxy Kubernetes Service.
+
+description: |
+  Utility charm for creating a Reverse Proxy Kubernetes Service.
