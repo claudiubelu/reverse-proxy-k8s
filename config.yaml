@@ -1,0 +1,44 @@
+# Copyright 2023 Claudiu Belu
+# See LICENSE file for licensing details.
+options:
+  proxy-url:
+    type: string
+    default: ""
+    description: |
+      The target URL to proxy the request to.
+
+  header-host:
+    type: string
+    default: ""
+    description: |
+      The 'Host' set in the request's header to the proxied target.
+
+  # Ingress related options.
+  service-hostname:
+    type: string
+    default: ""
+    description: |
+      The (ingress) hostname of the service to create an ingress for.
+      Will be passed to the ingress relation. If not set, self.app.name will be used instead.
+
+  service-port:
+    type: int
+    default: 80
+    description: |
+      The port of the service to create an ingress for.
+      Will be passed to the ingress relation.
+
+  path-routes:
+    type: string
+    default: "/"
+    description: |
+      Comma separated list of the routes under the hostname that you wish to map to the relation.
+      Example: "/admin,/portal" will map example.test/admin and example.test/portal only.
+      Will be passed to the ingress relation.
+
+  rewrite-enabled:
+    type: boolean
+    default: true
+    description: |
+      Will be passed to the ingress relation.
+      Whether requests should be written to the `rewrite-target`.
