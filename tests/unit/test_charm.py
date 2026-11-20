@@ -67,6 +67,32 @@ class TestCharm(unittest.TestCase):
         self.assertEqual(self.harness.model.unit.status, model.ActiveStatus())
         mock_override_nginx_config.assert_called_with(container)
 
+    def test_nginx_started_when_config_already_up_to_date(self):
+        # Simulates a retried hook: the nginx config was already pushed by an earlier,
+        # failed attempt, so there's no config change to trigger a restart. nginx must
+        # still be started.
+        self.harness.set_can_connect("nginx", True)
+        container = self.harness.model.unit.get_container("nginx")
+        expected_config = charm._NGINX_CONFIG_TEMPLATE % {
+            "proxy_url": "https://foo.lish",
+            "header_host": self.harness.charm.config["header-host"],
+        }
+        container.push(charm._NGINX_CONFD_DEFAULT, expected_config, make_dirs=True)
+        self.harness.update_config({"proxy-url": "https://foo.lish"})
+
+        self.harness.container_pebble_ready("nginx")
+
+        self.assertEqual(self.harness.model.unit.status, model.ActiveStatus())
+        self.assertTrue(container.get_service("nginx").is_running())
+
+        # nginx stopped while the config is unchanged (e.g. after being Blocked):
+        # the next status update should start it again.
+        container.stop("nginx")
+        self.harness.update_config({"proxy-url": "https://foo.lish"})
+        self.harness.charm.on.config_changed.emit()
+
+        self.assertTrue(container.get_service("nginx").is_running())
+
     def test_config_changed(self):
         container = self.harness.model.unit.get_container("nginx")
         mock_can_connect = self._patch(container, "can_connect")

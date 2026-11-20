@@ -91,6 +91,11 @@ class ReverseProxyK8SCharm(ops.CharmBase):
 
         self._override_nginx_config(container)
 
+        # _override_nginx_config only restarts nginx when the config changes. Make sure
+        # it's running even if the config was already up to date (e.g. a hook retried
+        # after the config was pushed, or nginx was stopped while Blocked).
+        container.replan()
+
         self.unit.status = ops.ActiveStatus()
 
     def _get_ingress_config(self):
